@@ -1,0 +1,106 @@
+#!/usr/bin/env node
+
+var http = require('http');
+var config 	   = require('../config');
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');//module API
+var cli = require('../cli');//module CLI
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var apiport = config.apiport;
+app.set('apiport', apiport);
+
+if (config.ENV=='prod'){
+	console.log("Start in production mode")
+	var cliport = config.cliport;
+	cli.set('cliport', cliport);
+	
+	var client = http.createServer(cli).listen(cliport);	
+	client.on('error', onErrorC);
+	client.on('listening', onListeningC);
+} else {
+	console.log("Start in dev mode")
+}
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app).listen(apiport);
+server.on('error', onErrorS);
+server.on('listening', onListeningS);
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onErrorS(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+  
+  var bind=apiport
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+function onErrorC(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+  
+  var bind=cliport
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListeningS() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  console.log('Server listening on ' + bind);
+}
+function onListeningC() {
+  var addr = client.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  console.log('Client listening on ' + bind);
+}
+
+
