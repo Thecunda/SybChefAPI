@@ -5,24 +5,24 @@ var UserService = require('../../syb.core/users/users.service');
 _this = this
 
 exports.getRecipes = async function(req, res, next){
-	trace.log("getRecipes API Controller")
-	
-	if(mongoError.status){//if mongo fails, return immediatly an error
-		return res.status(500).json({status: 500., message: "Database is down"})
-	}
+  trace.log("getRecipes API Controller")
 
-		var page = req.query.page ? req.query.page : 1;
-		var limit = req.query.limit ? req.query.limit : 10; 
-		var offset = (page-1)*9
-		
-		trace.log("Page # " + page + " of "+limit+" recipes")
+  if(mongoError.status){//if mongo fails, return immediatly an error
+    return res.status(500).json({status: 500., message: "Database is down"})
+  }
 
-		try{
-			var recipes = await RecipeService.getRecipes({}, page, limit, offset)
-			return res.status(200).json({status: 200, data: recipes, message: "OK"});
-		}catch(e){
-			return res.status(400).json({status: 400, message: e.message});
-		}
+  var page = req.query.page ? req.query.page : 1;
+  var limit = new Number(req.query.limit ? req.query.limit : 10);
+  var offset = (page-1)*(limit-1)
+  
+  trace.log("Page # " + page + " of "+limit+" recipes: offset "+offset)
+
+  try{
+    var recipes = await RecipeService.getRecipes({}, page, limit, offset)
+    return res.status(200).json({status: 200, data: recipes, message: "OK"});
+  }catch(e){
+    return res.status(400).json({status: 400, message: e.message});
+  }
 
 }
 
@@ -118,7 +118,7 @@ exports.removeRecipe = async function(req, res, next){
 
     try{
         var deleted = await RecipeService.deleteRecipe(id)
-        return res.status(204).json({status:204, message: "OK"})
+        return res.status(204).json({status: 204, message: "OK"})
     }catch(e){
         return res.status(400).json({status: 400, message: "Check admin error : " + e.message})
     }

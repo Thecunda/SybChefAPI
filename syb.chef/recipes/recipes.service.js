@@ -5,28 +5,28 @@ var moment 	   = require('moment');
 _this = this
 
 exports.getRecipes = async function(query, page, limit, offset){
-	trace.log("getRecipes API service")
-		if(page!=0){
-			var options = {
-				limit:limit,
-				offset: offset,
-				sort : {date: 'desc'}
-			}
-			try {
-				var recipes = await Recipe.paginate(query, options)
-				return recipes;
-			} catch (e) {
-				throw Error('Error while Paginating Recipes = ' + e.message)
-			}
-		} else {
-			try {
-				var recipes = await Recipe.find({})
-				return recipes;
-			} catch (e) {
-				throw Error('Error while getting all recipes = ' + e.message)
-			}
-		}
-		
+  trace.log("getRecipes API service page "+page+" limit "+limit)
+  if(page!=0){
+    var options = {
+      limit: limit,
+      offset: offset,
+      sort : {designation: 'asc'}
+    }
+    try {
+      var recipes = await Recipe.paginate(query, options)
+      return recipes;
+    } catch (e) {
+      throw Error('Error while Paginating Recipes = ' + e.message)
+    }
+  } else {
+    try {
+      var recipes = await Recipe.find({})
+      return recipes;
+    } catch (e) {
+      throw Error('Error while getting all recipes = ' + e.message)
+    }
+  }
+  
 }
 
 exports.createRecipe = async function(recipe){
